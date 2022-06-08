@@ -1,2 +1,0 @@
-attack_type,average_incoming_traffic,attack_protocol,average_incoming_flow,average_incoming_pps,ip
-dos,342464,tcp,10,34,123.343.56.78
