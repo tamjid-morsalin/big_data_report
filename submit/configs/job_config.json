@@ -1,0 +1,11 @@
+{
+	"destination_path": {
+		"file":{
+			"path": "/home/tamjid/Work/big_data_report/response/",
+			"postfix_name": "_response",
+			"type": "csv",
+			"file_server_path": "http://localhost:6000/file/"
+		}
+	},
+	"notify_path": "http://localhost:5000/callback"
+}

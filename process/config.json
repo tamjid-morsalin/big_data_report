@@ -1,0 +1,7 @@
+{
+	"spark_master": "spark://tamjid-Lenovo-B41-80:7077",
+	"submit_apllication_path": "/home/tamjid/Work/big_data_report/submit/",
+	"spark_conf": {
+		"spark.cassandra.connection.host": "127.0.0.1"
+	}
+}

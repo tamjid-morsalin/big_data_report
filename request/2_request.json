@@ -1,0 +1,1 @@
+{"query": "select * FROM test_latency WHERE attack_type = 'dos' and average_incoming_traffic = 342464", "type": "READ", "callback": "http://127.0.0.1:5000/tp-callback", "connection": {"type": "cassandra", "host": "127.0.0.1", "port": "9420", "databse": "keyspace_test_latency"}, "structure": {"FROM": {"keyspace": "keyspace_test_latency", "table": "test_latency"}}, "id": 2}
