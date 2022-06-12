@@ -51,7 +51,7 @@ def process():
 	table_name = parse_table(query)
 	response['structure'] = {}
 	response['structure']['FROM'] = {}
-	response['structure']['FROM']['keyspace'] = connection['databse']
+	response['structure']['FROM']['keyspace'] = connection['database']
 	response['structure']['FROM']['table'] = table_name
 
 	#establishing the connection
