@@ -2,9 +2,26 @@ import flask
 from flask import request
 import mysql.connector
 import requests
+import sys
+import os.path
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+def getDBConnection():
+	db_config_file = open(os.getcwd()+"/configs/config.database.json")
+	db_config_data = json.load(db_config_file)
+	db_config_file.close()
+
+	config = db_config_data['develop']
+
+	return mysql.connector.connect(
+   		user=config['user'], 
+   		password=config['password'], 
+   		host=config['host'],
+   		auth_plugin=config['auth'],
+   		database=config['database']
+	)
 
 @app.route('/tp-callback', methods=['POST'])
 def tpCallback():
@@ -17,13 +34,7 @@ def callBack():
 	requestBody = request.json
 	
 	#establishing the connection
-	conn = mysql.connector.connect(
-   		user='root', 
-   		password='root', 
-   		host='127.0.0.1',
-   		auth_plugin='mysql_native_password',
-   		database='big_data_report'
-	)
+	conn = getDBConnection()
 
 	cursor = conn.cursor()
 
