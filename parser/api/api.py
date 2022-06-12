@@ -8,11 +8,28 @@ import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+print(os.getcwd())
+
 from lib.parse import search
 import requests
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+def getDBConnection():
+	db_config_file = open(os.getcwd()+"/configs/config.database.json")
+	db_config_data = json.load(db_config_file)
+	db_config_file.close()
+
+	config = db_config_data['develop']
+
+	return mysql.connector.connect(
+   		user=config['user'], 
+   		password=config['password'], 
+   		host=config['host'],
+   		auth_plugin=config['auth'],
+   		database=config['database']
+	)
 
 def parse_table(query):
 	table_name = search('FROM {:w} ', query)
@@ -40,13 +57,7 @@ def process():
 	response['structure']['FROM']['table'] = table_name
 
 	#establishing the connection
-	conn = mysql.connector.connect(
-   		user='root', 
-   		password='root', 
-   		host='127.0.0.1',
-   		auth_plugin='mysql_native_password',
-   		database='big_data_report'
-	)
+	conn = getDBConnection()
 
 	#Creating a cursor object using the cursor() method
 	cursor = conn.cursor()
