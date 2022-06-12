@@ -8,17 +8,28 @@ import requests
 import threading
 import subprocess
 import time
+import sys
+import os.path
+
+def getDBConnection():
+	db_config_file = open(os.getcwd()+"/configs/config.database.json")
+	db_config_data = json.load(db_config_file)
+	db_config_file.close()
+
+	config = db_config_data['develop']
+
+	return mysql.connector.connect(
+   		user=config['user'], 
+   		password=config['password'], 
+   		host=config['host'],
+   		auth_plugin=config['auth'],
+   		database=config['database']
+	)
 
 def process():
 	try:
 
-		conn = mysql.connector.connect(
-		   		user='root', 
-		   		password='root', 
-		   		host='127.0.0.1',
-		   		auth_plugin='mysql_native_password',
-		   		database='big_data_report'
-		)
+		conn = getDBConnection()
 
 		cursor = conn.cursor()
 		cursor.execute("SELECT * FROM queries where execution_status = 'INITIATED' ORDER BY id LIMIT 5")
@@ -41,13 +52,13 @@ def process():
 				query = data['query']
 				query_file.close()
 
-				config_file = open("./config.json")
-				config_data = json.load(config_file)
-				config_file.close()
+				spark_config_file = open(os.getcwd()+"/configs/spark.config.json")
+				spark_config_data = json.load(spark_config_file)
+				spark_config_file.close()
 				
-				spark_master = config_data['spark_master']
-				submit_application_path = config_data['submit_apllication_path']
-				conf = config_data['spark_conf']
+				spark_master = spark_config_data['spark_master']
+				submit_application_path = spark_config_data['submit_apllication_path']
+				conf = spark_config_data['spark_conf']
 
 				spark_submit_str = ('spark-submit '
 									'--master ' + spark_master + ' '
