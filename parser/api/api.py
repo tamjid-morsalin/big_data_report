@@ -30,8 +30,18 @@ def getDBConnection():
 	)
 
 def parse_table(query):
+	result_table = []
 	table_name = search('FROM {:w} ', query)
-	return table_name[0]
+	join_table_name = search('JOIN {:w} ', query)
+
+	if table_name is not None:
+		for x in table_name:
+			result_table.append(x)
+	if join_table_name is not None:
+		for x in join_table_name:
+			result_table.append(x)
+
+	return result_table
 
 @app.route('/process', methods=['POST'])
 def process():

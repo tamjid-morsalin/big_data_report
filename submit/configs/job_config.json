@@ -1,10 +1,23 @@
 {
 	"destination_path": {
 		"file":{
+			"ftp": {
+				"format": "filetransfer",
+				"host": "localhost",
+				"port": "21",
+				"username": "tamjid",
+				"password": "HAPPYlife",
+				"protocol": "sftp",
+				"fileFormat": "csv",
+				"path": "/home/tamjid/Work/big_data_report/response/",
+				"postfix_name": "_response",
+				"download_file_path": "http://localhost:6000/file/"
+			},
 			"path": "/home/tamjid/Work/big_data_report/response/",
 			"postfix_name": "_response",
 			"type": "csv",
-			"file_server_path": "http://localhost:6000/file/"
+			"file_server_path": "http://localhost:6000/file/",
+			"test_ftp_file_path": "ftp://anonymous:HAPPYlife@localhost:21/home/tamjid/Work/big_data_report/response/"
 		}
 	},
 	"notify_path": "http://localhost:5000/callback"
