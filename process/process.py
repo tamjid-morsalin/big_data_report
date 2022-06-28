@@ -70,7 +70,7 @@ def process():
 					spark_submit_str+= ('--conf ' + key + '=' + value)
 
 				spark_submit_str += ' ' + submit_application_path + 'jobs/job.py' + ' ' + str(query_result[0])
-
+				
 				process=subprocess.Popen(spark_submit_str,stdout=subprocess.PIPE,stderr=subprocess.PIPE, universal_newlines=True, shell=True)
 				stdout,stderr = process.communicate()
 				# if process.returncode !=0:
