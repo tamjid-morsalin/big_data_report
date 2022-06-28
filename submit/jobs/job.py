@@ -24,7 +24,7 @@ def extract_transform_data(spark, request):
 # 	return transformed_data
 
 def load_data(df, config, request):
-	TEMPORARY_TARGET=config['destination_path']['file']['path']
+	TEMPORARY_TARGET=config['destination_path']['file']['path'] + str(request['id']) + config['destination_path']['file']['postfix_name']
 	#TEMPORARY_TARGET=config['destination_path']['file']['ftp']
 	DESIRED_TARGET=config['destination_path']['file']['path'] + str(request['id']) + config['destination_path']['file']['postfix_name'] + '.csv'
 

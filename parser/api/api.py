@@ -31,8 +31,8 @@ def getDBConnection():
 
 def parse_table(query):
 	result_table = []
-	table_name = search('FROM {:w} ', query)
-	join_table_name = search('JOIN {:w} ', query)
+	table_name = search(' FROM {:w} ', query)
+	join_table_name = search(' JOIN {:w} ', query)
 
 	if table_name is not None:
 		for x in table_name:
