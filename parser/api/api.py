@@ -45,59 +45,68 @@ def parse_table(query):
 
 @app.route('/process', methods=['POST'])
 def process():
-	requestBody = request.json
-
-	query = requestBody['query']
-	query_type = requestBody['type']
-	callback = requestBody['callback']
-	connection = requestBody['connection']
-
-	response = {}
-	response['query'] = query
-	response['type'] = query_type
-	response['callback'] = callback
-	response['connection'] = connection
-
-	table_name = parse_table(query)
-	response['structure'] = {}
-	response['structure']['FROM'] = {}
-	response['structure']['FROM']['keyspace'] = connection['database']
-	response['structure']['FROM']['table'] = table_name
 
 	#establishing the connection
 	conn = getDBConnection()
 
 	#Creating a cursor object using the cursor() method
 	cursor = conn.cursor()
+	try:
+		requestBody = request.json
+		response = {}
+		query = requestBody['query']
+		query_type = requestBody['type']
+		callback = requestBody['callback']
+		connection = requestBody['connection']
 
-	#fetch last row from query table
-	cursor.execute("SELECT * FROM queries ORDER BY id DESC LIMIT 1")
-	fetch_info = cursor.fetchone()
-	if fetch_info is None:
-		id=1
+		response['query'] = query
+		response['type'] = query_type
+		response['callback'] = callback
+		response['connection'] = connection
+		response['structure'] = {}
+		response['structure']['FROM'] = {}
+		response['structure']['FROM']['keyspace'] = connection['database']
+		response['structure']['FROM']['table'] = parse_table(query)
+
+		#fetch last row from query table
+		cursor.execute("SELECT * FROM queries ORDER BY id DESC LIMIT 1")
+		fetch_info = cursor.fetchone()
+		if fetch_info is None:
+			id=1
+		else:
+			id=fetch_info[0]+1
+		response['id'] = id
+
+		directory = Path().absolute()
+		query_json_file_path = Path(directory).parents[0]
+		filePath = str(query_json_file_path)+"/request/"+str(id)+"_request.json"
+		with open(filePath, "w") as outfile:
+			json.dump(response,outfile)
+
+	except KeyError as ke:
+		filePath = None
+		executionStatus = 'PARSER_FAILED'
+	except FileNotFoundError as fnf:
+		filePath = None
+		executionStatus = 'PARSER_FAILED'
+	except Exception as e:
+		filePath = None
+		executionStatus = 'PARSER_FAILED'
 	else:
-		id=fetch_info[0]+1
-	
-	directory = Path().absolute()
-	query_json_file_path = Path(directory).parents[0]
-	file_path = str(query_json_file_path)+"/request/"+str(id)+"_request.json"
-	response['id'] = id
-	with open(file_path, "w") as outfile:
-		json.dump(response,outfile)
+		executionStatus = 'INITIATED'
+	finally:
+		insert_query_for_query_table = ("INSERT INTO queries "
+               "(request_file_path, execution_status) "
+               "VALUES (%s, %s)")
+		data_for_query_table = (filePath, executionStatus)
+		# Insert new query info
+		cursor.execute(insert_query_for_query_table, data_for_query_table)
 
-	insert_query_for_query_table = ("INSERT INTO queries "
-               "(request_file_path, execution_status, callback) "
-               "VALUES (%s, %s, %s)")
-
-	data_for_query_table = (file_path, 'INITIATED', callback)
-
-	# Insert new query info
-	cursor.execute(insert_query_for_query_table, data_for_query_table)
-	query_no = cursor.lastrowid
-	conn.commit()
-	cursor.close()
-	conn.close()
-	return "success"
+		query_no = cursor.lastrowid
+		conn.commit()
+		cursor.close()
+		conn.close()
+		return "success"
 
 if __name__ == '__main__':
     app.run(host= '127.0.0.1',port='3000',debug=True)

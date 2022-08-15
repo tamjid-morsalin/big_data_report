@@ -36,21 +36,19 @@ def callBack():
 	
 	#establishing the connection
 	conn = getDBConnection()
-
 	cursor = conn.cursor()
 
-	updatedId= requestBody["data"]["id"]
+	try:
+		updatedId= requestBody["data"]["id"]
+		if requestBody['code'] == 0:
+			cursor.execute("UPDATE queries SET execution_status='SUCCESS', response_file_path='%s' WHERE id=%s" % (requestBody['data']['file'],updatedId))
+		else:
+			cursor.execute("UPDATE queries SET execution_status='JOB_FAILED' WHERE id=%s" % (updatedId))
 
-	if requestBody['code'] == 0:
-		cursor.execute("UPDATE queries SET execution_status='SUCCESS', response_file_path='%s' WHERE id=%s" % (requestBody['data']['file'],updatedId))
-	else:
-		cursor.execute("UPDATE queries SET execution_status='FAILED' WHERE id=%s" % (updatedId))
-
-	if requestBody['data']['callback']:
-		try:
+		if requestBody['data']['callback']:
 			response = requests.post(requestBody['data']['callback'], json = requestBody)
-		except Exception as e:
-			raise SystemExit(e)
+	except Exception as e:
+		cursor.execute("UPDATE queries SET execution_status='CALLBACK_FAILED' WHERE id=%s" % (updatedId))
 
 	conn.commit()
 	cursor.close()
